@@ -1,46 +1,638 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
+
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <title>Mập's Lines98 Pro v6.1</title>
+    <style>
+        :root {
+            --bg: #c0c0c0;
+            --panel: #0a0a14;
+            --led: #00ffcc;
+            --accent: #ffe600;
+        }
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+        * {
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0
+        }
 
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden
+        }
 
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="/">
+        body {
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', -apple-system, sans-serif
+        }
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+        #game {
+            background: var(--bg);
+            width: 100%;
+            height: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            border: 3px outset #ddd;
+            position: relative
+        }
 
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="my_app">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+        #topbar {
+            background: var(--panel);
+            margin: 5px;
+            height: 68px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 14px;
+            border: 2px inset #555;
+            flex-shrink: 0
+        }
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+        .led {
+            color: var(--led);
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--led);
+            letter-spacing: 2px
+        }
 
-  <title>my_app</title>
-  <link rel="manifest" href="manifest.json">
+        .lbl {
+            font-size: 9px;
+            color: #667;
+            text-transform: uppercase;
+            text-align: center
+        }
+
+        .grp {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px
+        }
+
+        #preview {
+            display: flex;
+            gap: 5px;
+            background: #111;
+            padding: 5px 8px;
+            border: 2px inset #444;
+            border-radius: 3px
+        }
+
+        .pvb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, .3);
+            box-shadow: inset -2px -2px 4px rgba(0, 0, 0, .4)
+        }
+
+        #wrap {
+            flex: 1;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4px;
+            background: #a0a0a0;
+            border: 3px inset #888;
+            margin: 0 5px;
+            overflow: hidden
+        }
+
+        canvas {
+            display: block;
+            image-rendering: auto
+        }
+
+        #bar {
+            height: 70px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 6px 5px;
+            flex-shrink: 0
+        }
+
+        .b {
+            background: #d4d4d4;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px outset #eee;
+            white-space: nowrap
+        }
+
+        .b:active {
+            border-style: inset;
+            filter: brightness(.92)
+        }
+
+        #ov {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            z-index: 10;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center
+        }
+
+        #ov h2 {
+            font-size: 26px;
+            text-shadow: 0 0 20px #f44
+        }
+
+        #ov p {
+            font-size: 15px;
+            color: #ccc;
+            margin: 6px 0
+        }
+
+        #ov button {
+            margin-top: 14px;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--accent);
+            color: #111;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer
+        }
+
+        #hs {
+            color: var(--accent);
+            font-size: 11px
+        }
+    </style>
 </head>
-<body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+<body>
+    <div id="game">
+        <div id="ov">
+            <h2>GAME OVER</h2>
+            <p>Score: <span id="fs">0</span></p>
+            <p id="hs"></p>
+            <button onclick="G.reset()">CHƠI LẠI</button>
+        </div>
+        <div id="topbar">
+            <div class="grp">
+                <div class="lbl">Score</div>
+                <div class="led" id="sc">00000</div>
+            </div>
+            <div id="preview"></div>
+            <div class="grp">
+                <div class="lbl">Level</div>
+                <div class="led" id="lv" style="color:var(--accent)">01</div>
+            </div>
+        </div>
+        <div id="wrap"><canvas id="cv"></canvas></div>
+        <div id="bar">
+            <button class="b" id="snd" onclick="G.toggleSound()">🔊</button>
+            <button class="b" onclick="G.undo()">↩ HOÀN TÁC</button>
+            <button class="b" onclick="G.reset()" style="color:#d33">⟳ VÁN MỚI</button>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           MẬP'S LINES98 PRO v6.1 — Clean Code Rewrite
+           Tách biệt: Engine (logic) | Renderer (vẽ) | Game (controller)
+           ============================================================ */
+        'use strict';
+
+        // ─── CONSTANTS ───
+        const R = 12, C = 9, MATCH = 5, SPAWN = 3;
+        const BALL_COLORS = [
+            null,
+            { m: '#d30000', l: '#ff7777' }, { m: '#00a200', l: '#77ff77' },
+            { m: '#0000d3', l: '#7777ff' }, { m: '#d3d300', l: '#ffff77' },
+            { m: '#d300d3', l: '#ff77ff' }, { m: '#ff8c00', l: '#ffcc77' },
+            { m: '#00d3d3', l: '#77ffff' }
+        ];
+        const DIRS = [[0, 1], [1, 0], [1, 1], [1, -1]];
+        const SAVE_KEY = 'lines98_v61';
+
+        // ─── AUDIO ───
+        const Audio = {
+            ctx: null, on: true,
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            beep(freq, dur, vol) {
+                if (!this.on || !this.ctx) return;
+                try {
+                    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+                    o.connect(g); g.connect(this.ctx.destination);
+                    o.frequency.value = freq; g.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    o.start(); o.stop(this.ctx.currentTime + dur);
+                } catch (e) { }
+            },
+            select() { this.beep(1000, .04, .06); },
+            place() { this.beep(600, .07, .08); },
+            match() { this.beep(880, .2, .12); },
+            over() { this.beep(250, .4, .15); }
+        };
+
+        // ─── ENGINE (Pure Logic, No DOM) ───
+        class Engine {
+            constructor() { this.init(); }
+
+            init() {
+                this.board = [];
+                for (let r = 0; r < R; r++) { this.board[r] = []; for (let c = 0; c < C; c++) this.board[r][c] = 0; }
+                this.score = 0; this.level = 1; this.sel = null;
+                this.next = []; this.hist = []; this.over = false;
+            }
+
+            empties() {
+                const e = [];
+                for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) if (!this.board[r][c]) e.push([r, c]);
+                return e;
+            }
+
+            genNext() {
+                this.next = [];
+                const e = this.empties();
+                for (let i = 0; i < SPAWN && e.length; i++) {
+                    const idx = Math.floor(Math.random() * e.length);
+                    const [r, c] = e.splice(idx, 1)[0];
+                    this.next.push({ r, c, color: Math.floor(Math.random() * 7) + 1 });
+                }
+            }
+
+            spawn() {
+                for (const b of this.next) {
+                    if (!this.board[b.r][b.c]) this.board[b.r][b.c] = b.color;
+                    else {
+                        const e = this.empties();
+                        if (e.length) { const [r, c] = e[Math.floor(Math.random() * e.length)]; this.board[r][c] = b.color; }
+                    }
+                }
+                const rm = this.findMatches();
+                if (rm) this.removeMatches(rm);
+                this.genNext();
+                this.checkOver();
+                return rm;
+            }
+
+            checkOver() {
+                if (this.empties().length === 0) this.over = true;
+                return this.over;
+            }
+
+            findMatches() {
+                const set = new Set();
+                for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+                    const p = this.board[r][c]; if (!p) continue;
+                    for (const [dr, dc] of DIRS) {
+                        const line = [[r, c]]; let nr = r + dr, nc = c + dc;
+                        while (nr >= 0 && nr < R && nc >= 0 && nc < C && this.board[nr][nc] === p) { line.push([nr, nc]); nr += dr; nc += dc; }
+                        if (line.length >= MATCH) for (const [lr, lc] of line) set.add(lr * C + lc);
+                    }
+                }
+                if (!set.size) return null;
+                const cells = [];
+                for (const k of set) cells.push({ r: Math.floor(k / C), c: k % C, color: this.board[Math.floor(k / C)][k % C] });
+                return cells;
+            }
+
+            removeMatches(cells) {
+                for (const { r, c } of cells) this.board[r][c] = 0;
+                this.score += 10 + (cells.length - 5) * 5;
+                this.level = Math.floor(this.score / 500) + 1;
+            }
+
+            // BFS pathfinding — returns [[r,c],...] or null
+            findPath(sr, sc, er, ec) {
+                if (sr === er && sc === ec) return null;
+                const vis = new Set(), par = new Map();
+                const k = (r, c) => r * C + c;
+                vis.add(k(sr, sc));
+                const q = [[sr, sc]];
+                while (q.length) {
+                    const [cr, cc] = q.shift();
+                    if (cr === er && cc === ec) {
+                        const path = []; let n = [er, ec];
+                        while (n) { path.unshift(n); n = par.get(k(n[0], n[1])); }
+                        return path;
+                    }
+                    for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+                        const nr = cr + dr, nc = cc + dc;
+                        if (nr >= 0 && nr < R && nc >= 0 && nc < C && !this.board[nr][nc] && !vis.has(k(nr, nc))) {
+                            vis.add(k(nr, nc)); par.set(k(nr, nc), [cr, cc]); q.push([nr, nc]);
+                        }
+                    }
+                }
+                return null;
+            }
+
+            pushHist() {
+                this.hist.push({
+                    board: this.board.map(r => r.slice()),
+                    score: this.score, level: this.level,
+                    next: JSON.parse(JSON.stringify(this.next))
+                });
+            }
+
+            popHist() {
+                if (!this.hist.length) return false;
+                const h = this.hist.pop();
+                this.board = h.board; this.score = h.score; this.level = h.level; this.next = h.next;
+                this.sel = null; this.over = false;
+                return true;
+            }
+
+            serialize() { return JSON.stringify({ board: this.board, score: this.score, level: this.level, next: this.next }); }
+            deserialize(s) { const d = JSON.parse(s); this.board = d.board; this.score = d.score; this.level = d.level; this.next = d.next; this.sel = null; this.over = false; this.hist = []; }
+        }
+
+        // ─── RENDERER (Canvas Only, No Game Logic) ───
+        class Renderer {
+            constructor(cv, wrap) {
+                this.cv = cv; this.ctx = cv.getContext('2d'); this.wrap = wrap;
+                this.cell = 0; this.particles = []; this.bounce = 0;
+                // Animation state
+                this.anim = null; // {path, color, idx, t, cb}
+            }
+
+            resize() {
+                const dpr = window.devicePixelRatio || 1;
+                const ww = this.wrap.clientWidth - 8, wh = this.wrap.clientHeight - 8;
+                this.cell = Math.max(4, Math.min(Math.floor(ww / C), Math.floor(wh / R)));
+                const pw = C * this.cell, ph = R * this.cell;
+                this.cv.width = pw * dpr; this.cv.height = ph * dpr;
+                this.cv.style.width = pw + 'px'; this.cv.style.height = ph + 'px';
+                this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            cellAt(px, py) {
+                const rect = this.cv.getBoundingClientRect();
+                const c = Math.floor((px - rect.left) / (rect.width / C));
+                const r = Math.floor((py - rect.top) / (rect.height / R));
+                return (r >= 0 && r < R && c >= 0 && c < C) ? [r, c] : null;
+            }
+
+            draw(engine) {
+                const ctx = this.ctx, S = this.cell;
+                const W = C * S, H = R * S;
+
+                // Restore transform every frame (bulletproof)
+                const dpr = window.devicePixelRatio || 1;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                // Clear
+                ctx.fillStyle = '#b4b4b4';
+                ctx.fillRect(0, 0, W, H);
+
+                // Win98 3D cells
+                for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+                    const x = c * S, y = r * S;
+                    ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(x + .5, y + S); ctx.lineTo(x + .5, y + .5); ctx.lineTo(x + S, y + .5); ctx.stroke();
+                    ctx.strokeStyle = '#777'; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(x + S - .5, y); ctx.lineTo(x + S - .5, y + S - .5); ctx.lineTo(x, y + S - .5); ctx.stroke();
+                }
+
+                // Outer border
+                ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.strokeRect(0, 0, W, H);
+
+                // Next-ball previews (small)
+                if (!this.anim) for (const nb of engine.next) {
+                    if (!engine.board[nb.r][nb.c]) this._ball(nb.c * S + S / 2, nb.r * S + S / 2, nb.color, S / 8);
+                }
+
+                // Balls
+                for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+                    const v = engine.board[r][c]; if (!v) continue;
+                    const x = c * S + S / 2, y = r * S + S / 2;
+                    if (engine.sel && engine.sel[0] === r && engine.sel[1] === c) {
+                        // Bounce
+                        this.bounce += .08;
+                        const dy = Math.abs(Math.sin(this.bounce)) * S * .12;
+                        this._ball(x, y - dy, v, S / 2 - 4);
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+                        ctx.strokeRect(c * S + 3, r * S + 3, S - 6, S - 6);
+                    } else {
+                        this._ball(x, y, v, S / 2 - 4);
+                    }
+                }
+
+                // Move animation ball
+                if (this.anim) {
+                    const a = this.anim, p0 = a.path[a.idx], p1 = a.path[Math.min(a.idx + 1, a.path.length - 1)];
+                    const ax = (p0[1] + (p1[1] - p0[1]) * a.t) * S + S / 2;
+                    const ay = (p0[0] + (p1[0] - p0[0]) * a.t) * S + S / 2;
+                    this._ball(ax, ay, a.color, S / 2 - 4);
+                }
+
+                // Particles
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx; p.y += p.vy; p.life -= .04;
+                    if (p.life <= 0) { this.particles.splice(i, 1); continue; }
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.col;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.life * 3.5, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            }
+
+            _ball(x, y, colorId, rad) {
+                const ctx = this.ctx, col = BALL_COLORS[colorId];
+                // Shadow
+                ctx.fillStyle = 'rgba(0,0,0,.18)';
+                ctx.beginPath(); ctx.arc(x + 1.5, y + 1.5, rad, 0, Math.PI * 2); ctx.fill();
+                // Body
+                const g = ctx.createRadialGradient(x - rad / 3, y - rad / 3, rad / 8, x, y, rad);
+                g.addColorStop(0, col.l); g.addColorStop(1, col.m);
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill();
+                // Highlight
+                if (rad > 8) {
+                    const hx = x - rad * .3, hy = y - rad * .35, hr = rad * .35;
+                    const h = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
+                    h.addColorStop(0, 'rgba(255,255,255,.55)'); h.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = h;
+                    ctx.beginPath(); ctx.arc(hx, hy, hr, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+
+            explode(r, c, colorId) {
+                const S = this.cell, col = BALL_COLORS[colorId];
+                for (let i = 0; i < 10; i++) this.particles.push({
+                    x: c * S + S / 2, y: r * S + S / 2,
+                    vx: (Math.random() - .5) * 7, vy: (Math.random() - .5) * 7,
+                    life: 1, col: col.m
+                });
+            }
+
+            animateMove(path, color, cb) {
+                this.anim = { path, color, idx: 0, t: 0, cb };
+            }
+
+            stepAnim() {
+                if (!this.anim) return false;
+                const a = this.anim;
+                a.t += .25;
+                if (a.t >= 1) {
+                    a.t = 0; a.idx++;
+                    if (a.idx >= a.path.length - 1) {
+                        const cb = a.cb; this.anim = null; cb(); return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        // ─── GAME CONTROLLER ───
+        class Game {
+            constructor() {
+                this.engine = new Engine();
+                this.ren = new Renderer(document.getElementById('cv'), document.getElementById('wrap'));
+                this.locked = false;
+                this._setup();
+            }
+
+            _setup() {
+                this.ren.resize();
+
+                // Load or new game
+                const s = localStorage.getItem(SAVE_KEY);
+                if (s) { try { this.engine.deserialize(s); } catch (e) { this._newGame(); } }
+                else this._newGame();
+
+                this._ui();
+                this._loop();
+                this._input();
+                window.addEventListener('resize', () => { this.ren.resize(); });
+                window.addEventListener('beforeunload', () => { this._autoSave(); });
+            }
+
+            _newGame() {
+                this.engine.init();
+                this.engine.genNext();
+                this.engine.spawn();
+            }
+
+            _loop() {
+                const tick = () => {
+                    requestAnimationFrame(tick);
+                    this.ren.stepAnim();
+                    this.ren.draw(this.engine);
+                };
+                tick();
+            }
+
+            _input() {
+                const cv = this.ren.cv;
+                const handler = (px, py) => {
+                    Audio.init();
+                    if (this.locked || this.engine.over) return;
+                    const pos = this.ren.cellAt(px, py);
+                    if (!pos) return;
+                    const [r, c] = pos;
+
+                    if (this.engine.board[r][c]) {
+                        this.engine.sel = [r, c]; this.ren.bounce = 0; Audio.select();
+                    } else if (this.engine.sel) {
+                        const [sr, sc] = this.engine.sel;
+                        const path = this.engine.findPath(sr, sc, r, c);
+                        if (!path) return;
+
+                        this.locked = true;
+                        this.engine.pushHist();
+                        const color = this.engine.board[sr][sc];
+                        this.engine.board[sr][sc] = 0;
+                        this.engine.sel = null;
+
+                        Audio.place();
+                        this.ren.animateMove(path, color, () => {
+                            this.engine.board[r][c] = color;
+                            const rm = this.engine.findMatches();
+                            if (rm) {
+                                Audio.match();
+                                this.engine.removeMatches(rm);
+                                for (const cell of rm) this.ren.explode(cell.r, cell.c, cell.color);
+                                // Lines98 rule: no spawn after match (free turn)
+                            } else {
+                                const spawnMatch = this.engine.spawn();
+                                if (spawnMatch) for (const cell of spawnMatch) this.ren.explode(cell.r, cell.c, cell.color);
+                            }
+                            this._ui(); this.locked = false;
+                            this._autoSave();
+                            if (this.engine.over) this._gameOver();
+                        });
+                    }
+                };
+
+                cv.addEventListener('touchstart', e => { e.preventDefault(); handler(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+                cv.addEventListener('mousedown', e => { handler(e.clientX, e.clientY); });
+            }
+
+            _ui() {
+                document.getElementById('sc').textContent = String(this.engine.score).padStart(5, '0');
+                document.getElementById('lv').textContent = String(this.engine.level).padStart(2, '0');
+                const pv = document.getElementById('preview'); pv.innerHTML = '';
+                for (const nb of this.engine.next) {
+                    const d = document.createElement('div'); d.className = 'pvb';
+                    d.style.background = BALL_COLORS[nb.color].m; pv.appendChild(d);
+                }
+            }
+
+            _gameOver() {
+                Audio.over();
+                const best = parseInt(localStorage.getItem('lines98_hi') || '0', 10);
+                if (this.engine.score > best) localStorage.setItem('lines98_hi', String(this.engine.score));
+                document.getElementById('fs').textContent = this.engine.score;
+                document.getElementById('hs').textContent =
+                    this.engine.score > best ? '🏆 KỈ LỤC MỚI!' : 'Kỉ lục: ' + Math.max(best, this.engine.score);
+                document.getElementById('ov').style.display = 'flex';
+            }
+
+            _autoSave() {
+                if (!this.engine.over) {
+                    localStorage.setItem(SAVE_KEY, this.engine.serialize());
+                }
+            }
+
+            undo() { if (!this.locked && this.engine.popHist()) { this._ui(); this._autoSave(); } }
+
+            reset() {
+                document.getElementById('ov').style.display = 'none';
+                this._newGame(); this._ui(); this.locked = false;
+                this._autoSave();
+            }
+
+            toggleSound() {
+                Audio.on = !Audio.on;
+                document.getElementById('snd').textContent = Audio.on ? '🔊' : '🔇';
+            }
+        }
+
+        // ─── BOOTSTRAP ───
+        let G;
+        window.onload = () => { setTimeout(() => { G = new Game(); }, 50); };
+    </script>
 </body>
+
 </html>
